@@ -34,3 +34,8 @@ build/
 
 # Project exclude paths
 /node_modules/
+/mvnw
+/mvnw.cmd
+/package-lock.json
+/pom.xml
+.mvn/

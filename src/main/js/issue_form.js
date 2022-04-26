@@ -3,7 +3,7 @@ import Select from "@mui/material/Select";
 const React = require('react');
 const client = require('./client');
 
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Stack, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
@@ -11,52 +11,87 @@ import MenuItem from "@mui/material/MenuItem";
 
 export function IssueForm(props) {
 
+    const [issueExtant, setIssueExtant] = useState(null);
     const nav = useNavigate();
-    const issue = {};
+    const params = useParams();
 
+    //Selection options
     const [priorities, setPriorities] = useState([]);
     const [stages, setStages] = useState([]);
     const [users, setUsers] = useState([]);
 
+    //Form state
+    const[title, setTitle] = useState("");
+    const[description, setDescription] = useState("");
+    const[assignee, setAssignee] = useState("");
+    const[priority, setPriority] = useState("");
+
     useEffect(() => {
         client({
             method: "GET",
-            path: "api/users"
+            path: "/api/users"
         }).done(response => {
             setUsers(response.entity.content);
         })
         client({
             method: "GET",
-            path: "api/issuePriorities"
+            path: "/api/issuePriorities"
         }).done(response => {
             setPriorities(response.entity.content);
         })
         client({
             method: "GET",
-            path: "api/issueStages"
+            path: "/api/issueStages"
         }).done(response => {
             setStages(response.entity.content);
         })
+
+        if(props.mode === "edit") {
+            client({
+                method: "GET",
+                path: "/api/issues/" + params.id
+            }).done(response => {
+                setIssueExtant(response.entity)
+            })
+        }
+
     }, [])
+
+
+    useEffect(() => {
+        if(issueExtant == null)
+            return;
+        setTitle(issueExtant.title);
+        setDescription(issueExtant.description);
+        setAssignee(issueExtant.assignee.id);
+        setPriority(issueExtant.priority.id);
+    }, [issueExtant]);
 
     function handleSubmit(e) {
         e.preventDefault();
+
+        let issueData = {
+            "description" : description,
+            "title": title,
+            "assignee": assignee,
+            "priority": priority
+        }
+
+        if(props.mode === "edit")
+            issueData.id = issueExtant.id
+
         client({
-            method: 'POST',
-            path: "api/issues",
-            entity: issue,
+            method: props.mode === "new" ? "POST" : "PUT",
+            path: "/api/issues",
+            entity: issueData,
             headers: {'Content-Type': 'application/json'}
         }).done(response => {
             nav("/");
         });
     }
 
-    function handleFieldChange(e) {
-        let key = e.target.id;
-        issue[key] = e.target.value;
-    }
-
     return (
+
         <Stack
             component="form"
             noValidate
@@ -67,39 +102,35 @@ export function IssueForm(props) {
                 required
                 id="title"
                 label="Issue Title"
-                defaultValue=""
-                onChange={handleFieldChange}
+                value={title}
+                onChange= {(e) => {setTitle(e.target.value)}}
             />
             <TextField
                 required
                 id="description"
                 label="Issue Description"
-                defaultValue=""
+                value={description}
                 multiline
                 maxRows={20}
-                onChange={handleFieldChange}
+                onChange= {(e) => {setDescription(e.target.value)}}
             />
             <Select
                 required
                 id="priority"
                 label="Priority"
-                value={priorities[0]}
-                onChange={e => {
-                    issue["priority"] = e.target.value;
-                }}
+                value={priority}
+                onChange= {(e) => {setPriority(e.target.value)}}
             >
-                {priorities.map(priority => <MenuItem value={priority}>{priority.description}</MenuItem>)}
+                {priorities.map(priority => <MenuItem key={priority.id} value={priority}>{priority.description}</MenuItem>)}
             </Select>
             <Select
                 required
                 id="assignee"
                 label="Assignee"
-                value={users[0]}
-                onChange={e => {
-                    issue["assignee"] = e.target.value;
-                }}
+                value={assignee}
+                onChange= {(e) => {setAssignee(e.target.value)}}
             >
-                {users.map(user => <MenuItem value={user}>{user.firstName} {user.lastName}</MenuItem>)}
+                {users.map(user => <MenuItem key={user.id}  value={user}>{user.firstName} {user.lastName}</MenuItem>)}
             </Select>
             <Button onClick={handleSubmit}>
                 Submit

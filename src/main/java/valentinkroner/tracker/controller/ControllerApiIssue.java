@@ -18,6 +18,8 @@ import valentinkroner.tracker.repository.IssueStageRepository;
 import valentinkroner.tracker.repository.UserRepository;
 
 import java.rmi.ServerException;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class ControllerApiIssue {
@@ -31,10 +33,16 @@ public class ControllerApiIssue {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/api/issues/{id}")
+    public Issue getOne(@PathVariable Long id) {
+
+        return issueRepository.findById(id).orElseThrow();
+    }
+
     @GetMapping(path = "/api/issues")
     public Page<Issue> findIssues(
             @Join(path = "assignee", alias = "a")
-            @Spec(path = "a.id", params="assignee", spec = Equal.class)
+            @Spec(path = "a.id", params = "assignee", spec = Equal.class)
                     Specification<Issue> issueSpec,
             Pageable pageable) {
 
@@ -58,6 +66,24 @@ public class ControllerApiIssue {
         } else {
             return issue;
         }
+    }
+
+    @PutMapping(path = "/api/issues",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void update(
+            @RequestBody Issue update
+    ) {
+
+
+
+        issueRepository.save(update);
+    }
+
+    @DeleteMapping("/api/issues/{id}")
+    public void delete(@PathVariable Long id) {
+
+        Issue issue = issueRepository.findById(id).orElseThrow();
+        issueRepository.delete(issue);
     }
 
 
