@@ -1,4 +1,4 @@
-import {Grid} from "@mui/material";
+import {Button, Grid, Toolbar} from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -10,26 +10,60 @@ const React = require('react');
 const client = require('./client');
 const follow = require('./follow')
 
-export function IssueList(props) {
+export function IssueCardView(props) {
+
+    const [view, setView] = useState("stage")
+    const [ordering, setOrdering] = useState("priority.value")
+
+    let references = view === "stage" ? props.appData.stages : props.appData.priorities;
+    let issueTracks = references.map(
+        ref => <IssueTrack key={ref.id} appData={props.appData} filter={view} filterReference={ref} ordering={ordering}/>
+    );
+
+    return (
+        <div>
+            <Toolbar>
+                <Button variant="outlined" onClick={() => {
+                    setView("stage");
+                    setOrdering("priority.value");
+                }}>Sort: Stage</Button>
+                <Button variant="outlined" onClick={() => {
+                    setView("priority");
+                    setOrdering("stage.ordinal");
+                }}>Sort: Priority</Button>
+            </Toolbar>
+            {issueTracks}
+        </div>
+    )
+}
+
+
+export function IssueTrack(props) {
 
     const [issues, setIssues] = useState([]);
-    const [view, setView] = useState("by_stage")
 
     useEffect(() => {
-        client({method: 'GET', path: "/api/issues?assignee=" + props.appData.currentUser.id}).done(response => {
+
+        let path = `/api/issues?assignee=${props.appData.currentUser.id}&${props.filter}=${props.filterReference.id}&sort=${props.ordering}`
+
+        client({method: 'GET', path: path}).done(response => {
             setIssues(response.entity.content);
         });
-    }, []);
+    }, [props.filter, props.appData, props.filterReference, props.ordering]);
 
     let issueCards = issues.map(issue =>
         <IssueCard key={issue.id} issue={issue}/>
     );
+
     return (
-        <Grid container spacing={2} padding={2}
-              alignItems="stretch"
-        >
-            {issueCards}
-        </Grid>
+        <div>
+            <Chip variant="outlined" label={props.filterReference.description}/>
+            <Grid container spacing={2} padding={2}
+                  alignItems="stretch"
+            >
+                {issueCards}
+            </Grid>
+        </div>
     )
 }
 

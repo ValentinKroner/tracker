@@ -10,7 +10,7 @@ import AppBar from "@mui/material/AppBar";
 
 import {BrowserRouter, Route, Routes, useNavigate} from "react-router-dom";
 import {IssueForm} from "./issue_form";
-import {IssueList} from "./issue_list";
+import {IssueCardView} from "./issue_list";
 import {IssueView} from "./issue_view";
 
 function App() {
@@ -53,7 +53,7 @@ function App() {
     //Once loads are complete, set appData as single fixed entity
     useEffect(() => {
 
-        if(users == null || priorities == null || stages == null || projects == null)
+        if (users == null || priorities == null || stages == null || projects == null)
             return;
 
         setAppData({
@@ -68,30 +68,30 @@ function App() {
 
 
     return (
-        appData == null ? <div></div> :
+        appData == null ? <div/> :
             <div>
                 <AppBar position="static">
                     <Toolbar>
-                        <ButtonHome></ButtonHome>
-                        <ButtonNew></ButtonNew>
+                        <ButtonHome/>
+                        <ButtonNew/>
                     </Toolbar>
                 </AppBar>
 
                 <Routes>
                     <Route path="/" element={
-                        <IssueList
+                        <IssueCardView
                             appData={appData}
                         />
-                    }></Route>
+                    }/>
                     <Route path="issue/:id/view" element={
-                        <IssueView appData={appData}></IssueView>
-                    }></Route>
+                        <IssueView appData={appData}/>
+                    }/>
                     <Route path="issue/:id/edit" element={
-                        <IssueForm appData={appData} mode="edit"></IssueForm>
-                    }></Route>
+                        <IssueForm appData={appData} mode="edit"/>
+                    }/>
                     <Route path="issue/new" element={
-                        <IssueForm appData={appData} mode="new"></IssueForm>
-                    }></Route>
+                        <IssueForm appData={appData} mode="new"/>
+                    }/>
                 </Routes>
 
             </div>

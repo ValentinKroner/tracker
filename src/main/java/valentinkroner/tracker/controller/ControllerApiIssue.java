@@ -42,7 +42,13 @@ public class ControllerApiIssue {
     @GetMapping(path = "/api/issues")
     public Page<Issue> findIssues(
             @Join(path = "assignee", alias = "a")
-            @Spec(path = "a.id", params = "assignee", spec = Equal.class)
+            @Join(path = "stage", alias = "s")
+            @Join(path = "priority", alias = "p")
+            @And({
+                    @Spec(path = "a.id", params = "assignee", spec = Equal.class),
+                    @Spec(path = "s.id", params = "stage", spec = Equal.class),
+                    @Spec(path = "p.id", params = "priority", spec = Equal.class)
+            })
                     Specification<Issue> issueSpec,
             Pageable pageable) {
 
@@ -56,16 +62,10 @@ public class ControllerApiIssue {
     ) throws ServerException {
 
         //TODO use sort order when implemented
-        newIssue.setStage(issueStageRepository.findById(1L).get());
+        newIssue.setStage(issueStageRepository.findById(1L).orElseThrow());
         //TODO use system user when implemented
-        newIssue.setCreator(userRepository.findById(1L).get());
-        Issue issue = issueRepository.save(newIssue);
-
-        if (issue == null) {
-            throw new ServerException("Invalid data");
-        } else {
-            return issue;
-        }
+        newIssue.setCreator(userRepository.findById(1L).orElseThrow());
+        return issueRepository.save(newIssue);
     }
 
     @PutMapping(path = "/api/issues",
@@ -80,15 +80,15 @@ public class ControllerApiIssue {
         issue.setDescription(update.getDescription());
         issue.setTitle(update.getTitle());
 
-        if(update.getCreator() != null)
+        if (update.getCreator() != null)
             issue.setAssignee(update.getCreator());
-        if(update.getAssignee() != null)
+        if (update.getAssignee() != null)
             issue.setAssignee(update.getAssignee());
-        if(update.getStage() != null)
+        if (update.getStage() != null)
             issue.setStage(update.getStage());
-        if(update.getPriority() != null)
+        if (update.getPriority() != null)
             issue.setPriority(update.getPriority());
-        if(update.getProject() != null)
+        if (update.getProject() != null)
             issue.setPriority(update.getPriority());
 
         issueRepository.save(issue);

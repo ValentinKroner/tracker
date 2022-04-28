@@ -1,12 +1,14 @@
 package valentinkroner.tracker.domain;
 
+import org.hibernate.boot.model.source.spi.Sortable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class IssuePriority {
+public class IssuePriority implements Comparable<IssuePriority> {
 
     private Long id;
 
@@ -46,5 +48,10 @@ public class IssuePriority {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    @Override
+    public int compareTo(IssuePriority o) {
+        return this.getValue() - o.getValue();
     }
 }
