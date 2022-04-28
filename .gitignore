@@ -39,3 +39,4 @@ build/
 /package-lock.json
 /pom.xml
 .mvn/
+/src/main/resources/application.properties

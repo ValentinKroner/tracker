@@ -1,5 +1,7 @@
 package valentinkroner.tracker.domain;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,17 +9,24 @@ public class Issue {
 
     private Long id;
 
+    @NotNull
     private String title;
+
+    @NotNull
     private String description;
 
+    @NotNull
     private User creator;
 
     private User assignee;
 
+    @NotNull
     private Project project;
 
+    @NotNull
     private IssuePriority priority;
 
+    @NotNull
     private IssueStage stage;
 
     public void setId(Long id) {
@@ -30,6 +39,7 @@ public class Issue {
         return id;
     }
 
+    @Column(nullable = false)
     public String getTitle() {
         return title;
     }
@@ -38,6 +48,7 @@ public class Issue {
         this.title = title;
     }
 
+    @Column(nullable = false)
     public String getDescription() {
         return description;
     }
@@ -47,6 +58,7 @@ public class Issue {
     }
 
     @ManyToOne(targetEntity = User.class)
+    @JoinColumn(nullable = false)
     public User getCreator() {
         return creator;
     }
@@ -65,6 +77,7 @@ public class Issue {
     }
 
     @ManyToOne(targetEntity = Project.class)
+    @JoinColumn(nullable = false)
     public Project getProject() {
         return project;
     }
@@ -74,6 +87,7 @@ public class Issue {
     }
 
     @ManyToOne(targetEntity = IssuePriority.class)
+    @JoinColumn(nullable = false)
     public IssuePriority getPriority() {
         return priority;
     }
@@ -83,6 +97,7 @@ public class Issue {
     }
 
     @ManyToOne(targetEntity = IssueStage.class)
+    @JoinColumn(nullable = false)
     public IssueStage getStage() {
         return stage;
     }

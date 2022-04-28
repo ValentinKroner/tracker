@@ -15,38 +15,16 @@ export function IssueForm(props) {
     const nav = useNavigate();
     const params = useParams();
 
-    //Selection options
-    const [priorities, setPriorities] = useState([]);
-    const [stages, setStages] = useState([]);
-    const [users, setUsers] = useState([]);
-
     //Form state
-    const[title, setTitle] = useState("");
-    const[description, setDescription] = useState("");
-    const[assignee, setAssignee] = useState("");
-    const[priority, setPriority] = useState("");
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [assignee, setAssignee] = useState("");
+    const [priority, setPriority] = useState("");
+    const [project, setProject] = useState("");
 
     useEffect(() => {
-        client({
-            method: "GET",
-            path: "/api/users"
-        }).done(response => {
-            setUsers(response.entity.content);
-        })
-        client({
-            method: "GET",
-            path: "/api/issuePriorities"
-        }).done(response => {
-            setPriorities(response.entity.content);
-        })
-        client({
-            method: "GET",
-            path: "/api/issueStages"
-        }).done(response => {
-            setStages(response.entity.content);
-        })
 
-        if(props.mode === "edit") {
+        if (props.mode === "edit") {
             client({
                 method: "GET",
                 path: "/api/issues/" + params.id
@@ -57,27 +35,36 @@ export function IssueForm(props) {
 
     }, [])
 
+    function resolveById(id, collection) {
+        let filtered = collection.filter((a) => {
+            return a.id === id
+        });
+        return filtered.length > 0 ? filtered[0] : null;
+    }
 
     useEffect(() => {
-        if(issueExtant == null)
+        if (issueExtant == null)
             return;
         setTitle(issueExtant.title);
         setDescription(issueExtant.description);
-        setAssignee(issueExtant.assignee.id);
-        setPriority(issueExtant.priority.id);
+
+        setAssignee(resolveById(issueExtant.assignee.id, props.appData.users));
+        setPriority(resolveById(issueExtant.priority.id, props.appData.priorities));
+        setProject(resolveById(issueExtant.project.id, props.appData.projects));
     }, [issueExtant]);
 
     function handleSubmit(e) {
         e.preventDefault();
 
         let issueData = {
-            "description" : description,
+            "description": description,
             "title": title,
             "assignee": assignee,
-            "priority": priority
+            "priority": priority,
+            "project": project
         }
 
-        if(props.mode === "edit")
+        if (props.mode === "edit")
             issueData.id = issueExtant.id
 
         client({
@@ -103,8 +90,44 @@ export function IssueForm(props) {
                 id="title"
                 label="Issue Title"
                 value={title}
-                onChange= {(e) => {setTitle(e.target.value)}}
+                onChange={(e) => {
+                    setTitle(e.target.value)
+                }}
             />
+            <Select
+                required
+                id="project"
+                label="Project"
+                value={project}
+                onChange={(e) => {
+                    setProject(e.target.value)
+                }}
+            >
+                {props.appData.projects.map(project => <MenuItem key={project.id} value={project}>{project.name}</MenuItem>)}
+            </Select>
+            <Select
+                required
+                id="priority"
+                label="Priority"
+                value={priority}
+                onChange={(e) => {
+                    setPriority(e.target.value)
+                }}
+            >
+                {props.appData.priorities.map(priority => <MenuItem key={priority.id}
+                                                      value={priority}>{priority.description}</MenuItem>)}
+            </Select>
+            <Select
+                required
+                id="assignee"
+                label="Assignee"
+                value={assignee}
+                onChange={(e) => {
+                    setAssignee(e.target.value)
+                }}
+            >
+                {props.appData.users.map(user => <MenuItem key={user.id} value={user}>{user.firstName} {user.lastName}</MenuItem>)}
+            </Select>
             <TextField
                 required
                 id="description"
@@ -112,26 +135,10 @@ export function IssueForm(props) {
                 value={description}
                 multiline
                 maxRows={20}
-                onChange= {(e) => {setDescription(e.target.value)}}
+                onChange={(e) => {
+                    setDescription(e.target.value)
+                }}
             />
-            <Select
-                required
-                id="priority"
-                label="Priority"
-                value={priority}
-                onChange= {(e) => {setPriority(e.target.value)}}
-            >
-                {priorities.map(priority => <MenuItem key={priority.id} value={priority}>{priority.description}</MenuItem>)}
-            </Select>
-            <Select
-                required
-                id="assignee"
-                label="Assignee"
-                value={assignee}
-                onChange= {(e) => {setAssignee(e.target.value)}}
-            >
-                {users.map(user => <MenuItem key={user.id}  value={user}>{user.firstName} {user.lastName}</MenuItem>)}
-            </Select>
             <Button onClick={handleSubmit}>
                 Submit
             </Button>

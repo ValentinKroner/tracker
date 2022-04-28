@@ -6,20 +6,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import valentinkroner.tracker.domain.User;
-import valentinkroner.tracker.repository.UserRepository;
+import valentinkroner.tracker.domain.IssueStage;
+import valentinkroner.tracker.repository.IssueStageRepository;
 
 @RestController
-@RequestMapping("/api/users")
-public class ControllerApiUser {
+@RequestMapping("/api/issueStages")
+public class ControllerApiIssueStage {
 
     @Autowired
-    private UserRepository userRepository;
+    private IssueStageRepository issueStageRepository;
 
     @GetMapping
-    public Page<User> findUsers(
+    public Page<IssueStage> findIssuePriorities(
             Pageable pageable) {
-
-        return userRepository.findAll(pageable);
+        return issueStageRepository.findAll(pageable);
     }
 }

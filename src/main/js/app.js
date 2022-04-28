@@ -1,4 +1,3 @@
-
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
@@ -16,45 +15,86 @@ import {IssueView} from "./issue_view";
 
 function App() {
 
-    const [users, setUsers] = useState([]);
-    const [currentUser, setCurrentUser] = useState({});
+    const [appData, setAppData] = useState(null);
 
+    const [users, setUsers] = useState(null);
+    const [priorities, setPriorities] = useState(null);
+    const [stages, setStages] = useState(null);
+    const [projects, setProjects] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    //Initial load calls
     useEffect(() => {
         client({method: 'GET', path: '/api/users'}).done(response => {
-            setUsers(response.entity.content);
             //TODO use auth system when available
             setCurrentUser(response.entity.content[0]);
+            setUsers(response.entity.content);
         });
-    }, [])
+        client({
+            method: "GET",
+            path: "/api/issuePriorities"
+        }).done(response => {
+            setPriorities(response.entity.content);
+        })
+        client({
+            method: "GET",
+            path: "/api/issueStages"
+        }).done(response => {
+            setStages(response.entity.content);
+        })
+        client({
+            method: "GET",
+            path: "/api/projects"
+        }).done(response => {
+            setProjects(response.entity.content);
+        })
+    }, []);
+
+    //Once loads are complete, set appData as single fixed entity
+    useEffect(() => {
+
+        if(users == null || priorities == null || stages == null || projects == null)
+            return;
+
+        setAppData({
+            "users": users,
+            "currentUser": currentUser,
+            "priorities": priorities,
+            "stages": stages,
+            "projects": projects,
+        })
+
+    }, [users, priorities, stages, projects])
+
 
     return (
-        <div>
-            <AppBar position="static">
-                <Toolbar>
-                    <ButtonHome></ButtonHome>
-                    <ButtonNew></ButtonNew>
-                </Toolbar>
-            </AppBar>
+        appData == null ? <div></div> :
+            <div>
+                <AppBar position="static">
+                    <Toolbar>
+                        <ButtonHome></ButtonHome>
+                        <ButtonNew></ButtonNew>
+                    </Toolbar>
+                </AppBar>
 
-            <Routes>
-                <Route path="/" element={
-                    <IssueList
-                        users={users}
-                        currentUser={currentUser}
-                    />
-                }></Route>
-                <Route path="issue/:id/view" element={
-                    <IssueView></IssueView>
-                }></Route>
-                <Route path="issue/:id/edit" element={
-                    <IssueForm mode="edit"></IssueForm>
-                }></Route>
-                <Route path="issue/new" element={
-                    <IssueForm mode="new"></IssueForm>
-                }></Route>
-            </Routes>
+                <Routes>
+                    <Route path="/" element={
+                        <IssueList
+                            appData={appData}
+                        />
+                    }></Route>
+                    <Route path="issue/:id/view" element={
+                        <IssueView appData={appData}></IssueView>
+                    }></Route>
+                    <Route path="issue/:id/edit" element={
+                        <IssueForm appData={appData} mode="edit"></IssueForm>
+                    }></Route>
+                    <Route path="issue/new" element={
+                        <IssueForm appData={appData} mode="new"></IssueForm>
+                    }></Route>
+                </Routes>
 
-        </div>
+            </div>
     )
 }
 

@@ -16,15 +16,10 @@ export function IssueList(props) {
     const [view, setView] = useState("by_stage")
 
     useEffect(() => {
-        if (props.currentUser.id == null) {
-            setIssues([]);
-            return;
-        }
-
-        client({method: 'GET', path: "/api/issues?assignee=" + props.currentUser.id}).done(response => {
+        client({method: 'GET', path: "/api/issues?assignee=" + props.appData.currentUser.id}).done(response => {
             setIssues(response.entity.content);
         });
-    }, [props.currentUser])
+    }, []);
 
     let issueCards = issues.map(issue =>
         <IssueCard key={issue.id} issue={issue}/>

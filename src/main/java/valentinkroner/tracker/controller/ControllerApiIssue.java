@@ -74,9 +74,24 @@ public class ControllerApiIssue {
             @RequestBody Issue update
     ) {
 
+        //TODO use DTO/Mapper generation if this gets any bigger
 
+        Issue issue = issueRepository.findById(update.getId()).orElseThrow();
+        issue.setDescription(update.getDescription());
+        issue.setTitle(update.getTitle());
 
-        issueRepository.save(update);
+        if(update.getCreator() != null)
+            issue.setAssignee(update.getCreator());
+        if(update.getAssignee() != null)
+            issue.setAssignee(update.getAssignee());
+        if(update.getStage() != null)
+            issue.setStage(update.getStage());
+        if(update.getPriority() != null)
+            issue.setPriority(update.getPriority());
+        if(update.getProject() != null)
+            issue.setPriority(update.getPriority());
+
+        issueRepository.save(issue);
     }
 
     @DeleteMapping("/api/issues/{id}")
