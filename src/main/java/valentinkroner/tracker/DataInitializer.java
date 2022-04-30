@@ -83,6 +83,12 @@ public class DataInitializer implements CommandLineRunner {
         stageFinished.setOrdinal(2);
         this.issueStageRepository.save(stageFinished);
 
+        IssueStage stageClosed = new IssueStage();
+        stageClosed.setDescription("closed");
+        stageClosed.setOrdinal(3);
+        stageClosed.setHiddenByDefault(true);
+        this.issueStageRepository.save(stageClosed);
+
         //Project
         Project project = new Project();
         project.setName("Example project");

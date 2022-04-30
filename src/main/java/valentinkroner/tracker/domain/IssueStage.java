@@ -13,6 +13,8 @@ public class IssueStage {
     private String description;
     private int ordinal;
 
+    private boolean hiddenByDefault;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -37,5 +39,13 @@ public class IssueStage {
 
     public void setOrdinal(int order) {
         this.ordinal = order;
+    }
+
+    public boolean isHiddenByDefault() {
+        return hiddenByDefault;
+    }
+
+    public void setHiddenByDefault(boolean hiddenByDefault) {
+        this.hiddenByDefault = hiddenByDefault;
     }
 }

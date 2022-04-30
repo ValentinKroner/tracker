@@ -13,11 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import valentinkroner.tracker.domain.Issue;
+import valentinkroner.tracker.domain.IssueStage;
 import valentinkroner.tracker.repository.IssueRepository;
 import valentinkroner.tracker.repository.IssueStageRepository;
 import valentinkroner.tracker.repository.UserRepository;
 
 import java.rmi.ServerException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -99,6 +101,46 @@ public class ControllerApiIssue {
 
         Issue issue = issueRepository.findById(id).orElseThrow();
         issueRepository.delete(issue);
+    }
+
+    @GetMapping("/api/issues/advance/{id}")
+    public void advanceIssue(@PathVariable Long id) {
+
+        Issue issue = issueRepository.findById(id).orElseThrow();
+
+        int ordinal = issue.getStage().getOrdinal();
+        IssueStage stageNew = null;
+        for(IssueStage stage : issueStageRepository.findAll()) {
+            if(stage.getOrdinal() <= ordinal)
+                continue;
+            if(stageNew == null || stageNew.getOrdinal() > stage.getOrdinal())
+                stageNew = stage;
+        }
+
+        if(stageNew != null) {
+            issue.setStage(stageNew);
+            issueRepository.save(issue);
+        }
+    }
+
+    @GetMapping("/api/issues/revert/{id}")
+    public void revertIssue(@PathVariable Long id) {
+
+        Issue issue = issueRepository.findById(id).orElseThrow();
+
+        int ordinal = issue.getStage().getOrdinal();
+        IssueStage stageNew = null;
+        for(IssueStage stage : issueStageRepository.findAll()) {
+            if(stage.getOrdinal() >= ordinal)
+                continue;
+            if(stageNew == null || stageNew.getOrdinal() < stage.getOrdinal())
+                stageNew = stage;
+        }
+
+        if(stageNew != null) {
+            issue.setStage(stageNew);
+            issueRepository.save(issue);
+        }
     }
 
 
