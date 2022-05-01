@@ -1,4 +1,4 @@
-import {Button, Grid, Toolbar} from "@mui/material";
+import {Button, Container, Grid, Toolbar} from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -11,6 +11,9 @@ import MenuItem from "@mui/material/MenuItem";
 const React = require('react');
 const client = require('./client');
 const follow = require('./follow')
+
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from "@mui/material/IconButton";
 
 export function IssueCardView(props) {
 
@@ -28,7 +31,7 @@ export function IssueCardView(props) {
             key={ref.id}
             appData={props.appData}
             filter={view}
-            refreshView ={refreshView}
+            refreshView={refreshView}
             reload={reload}
             filterReference={ref}
             ordering={ordering}
@@ -37,7 +40,7 @@ export function IssueCardView(props) {
 
 
     return (
-        <div>
+        <Container>
             <Toolbar>
                 <Button variant="outlined" onClick={() => {
                     setView("stage");
@@ -48,8 +51,11 @@ export function IssueCardView(props) {
                     setOrdering("stage.ordinal");
                 }}>Sort: Priority</Button>
             </Toolbar>
-            {issueTracks}
-        </div>
+
+            <Container sx={{paddingLeft: -2}}>
+                {issueTracks}
+            </Container>
+        </Container>
     )
 }
 
@@ -75,7 +81,10 @@ export function IssueTrack(props) {
 
     return (
         <div>
-            <Chip variant="outlined" label={props.filterReference.description}/>
+            <Chip variant="outlined"
+                  label={props.filter.charAt(0).toUpperCase() + props.filter.slice(1) + ": " + props.filterReference.description}
+                  sx={{background: props.filterReference.color}}
+            />
             <Grid container spacing={2} padding={2}
                   alignItems="stretch"
             >
@@ -119,45 +128,66 @@ export function IssueCard(props) {
         setMenuAnchor(null);
     }
 
+    function viewIssue(e) {
+        nav("/issue/" + props.issue.id + "/view");
+    }
+
     return (
         <Grid item>
-            <Card sx={{maxWidth: 345}}>
+            <Card sx={{width: 300}}>
                 <CardContent>
-                    <Typography variant="h5" component="div"
-                                onClick={() => {
-                                    nav("/issue/" + props.issue.id + "/view")
-                                }}
-                    >
-                        {props.issue.title}
-                    </Typography>
 
-                    <Button onClick={openMenu}>
-                        M
-                    </Button>
+                    <Grid container rowSpacing={1}>
 
-                    <Menu
-                        open={menuAnchor != null}
-                        anchorEl={menuAnchor}
-                        onClose={closeMenu}
-                        keepMounted
-                    >
-                        <MenuItem onClick={advanceStage}>
-                            Next Stage
-                        </MenuItem>
-                        <MenuItem onClick={revertStage}>
-                            Previous Stage
-                        </MenuItem>
-                    </Menu>
+                        <Grid item container direction="row">
+                            <Grid item>
+                                <Chip size="small" label={props.issue.priority.description}
+                                      sx={{marginRight: 1, width: 90, background: props.issue.priority.color}}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Chip variant="outlined" size="small" label={props.issue.stage.description}
+                                      sx={{width: 90}}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <IconButton onClick={openMenu}><MenuIcon></MenuIcon></IconButton>
+                            </Grid>
+                        </Grid>
 
-                    <Typography component="div">
-                        <Chip label={props.issue.priority.description} sx={{background: props.issue.priority.color}}/>
-                        <Chip variant="outlined" label={props.issue.stage.description}/>
-                    </Typography>
+                        <Grid item>
+                            <Typography variant="h6" sx={{height: "4em"}} onClick={viewIssue}>
+                                {props.issue.title}
+                            </Typography>
+                        </Grid>
 
-                    <Typography component="div">
-                        Assignee: {props.issue.assignee.firstName + " " + props.issue.assignee.lastName}
-                    </Typography>
+                        <Grid item>
+                            <Typography>
+                                Assignee: {props.issue.assignee.firstName + " " + props.issue.assignee.lastName}
+                            </Typography>
+                        </Grid>
+
+                    </Grid>
+
                 </CardContent>
+
+                <Menu
+                    open={menuAnchor != null}
+                    anchorEl={menuAnchor}
+                    onClose={closeMenu}
+                    keepMounted
+                >
+                    <MenuItem onClick={viewIssue}>
+                        View Issue
+                    </MenuItem>
+                    <MenuItem onClick={advanceStage}>
+                        Next Stage
+                    </MenuItem>
+                    <MenuItem onClick={revertStage}>
+                        Previous Stage
+                    </MenuItem>
+                </Menu>
+
             </Card>
         </Grid>
     )

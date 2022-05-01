@@ -1,3 +1,5 @@
+import {Container} from "@mui/material";
+
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
@@ -7,6 +9,8 @@ import {useEffect, useState} from "react";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
+import HomeIcon from '@mui/icons-material/Home';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 import {BrowserRouter, Route, Routes, useNavigate} from "react-router-dom";
 import {IssueForm} from "./issue_form";
@@ -72,8 +76,10 @@ function App() {
             <div>
                 <AppBar position="static">
                     <Toolbar>
-                        <ButtonHome/>
-                        <ButtonNew/>
+                        <Container>
+                            <ButtonHome/>
+                            <ButtonNew/>
+                        </Container>
                     </Toolbar>
                 </AppBar>
 
@@ -103,15 +109,18 @@ function ButtonHome() {
     const nav = useNavigate();
     return <Button color="inherit" onClick={() => {
         nav("/")
-    }}>Home</Button>
+    }}><HomeIcon/></Button>
 }
 
 function ButtonNew() {
 
     const nav = useNavigate();
-    return <Button color="inherit" onClick={() => {
-        nav("/issue/new")
-    }}>New</Button>
+    return <Button
+        color="inherit" onClick={() => {nav("/issue/new")}}
+    >
+        <AddBoxIcon></AddBoxIcon>
+        New
+    </Button>
 }
 
 
