@@ -75,7 +75,7 @@ function App() {
     return (
         appData == null ? <div/> :
             <div>
-                <AppBar position="static" sx={{margin: 0}}>
+                <AppBar position="static" sx={{marginBottom: 4}}>
                     <Toolbar>
                         <Container>
                             <Grid container sx={{columnGap: 1}}>

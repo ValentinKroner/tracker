@@ -26,7 +26,9 @@ export function IssueCardView(props) {
     }
 
     let references = view === "stage" ? props.appData.stages : props.appData.priorities;
-    let issueTracks = references.filter(ref => {return ref.hiddenByDefault !== true}).map(
+    let issueTracks = references.filter(ref => {
+        return ref.hiddenByDefault !== true
+    }).map(
         ref => <IssueTrack
             key={ref.id}
             appData={props.appData}
@@ -41,7 +43,7 @@ export function IssueCardView(props) {
 
     return (
         <Container>
-            <Toolbar>
+            <Grid container gap={1} sx={{marginBottom: 2, marginTop: 2}}>
                 <Button variant="outlined" onClick={() => {
                     setView("stage");
                     setOrdering("priority.value");
@@ -50,11 +52,11 @@ export function IssueCardView(props) {
                     setView("priority");
                     setOrdering("stage.ordinal");
                 }}>Sort: Priority</Button>
-            </Toolbar>
+            </Grid>
 
-            <Container sx={{paddingLeft: -2}}>
-                {issueTracks}
-            </Container>
+            <Grid container direction={"column"} gap={4}>
+            {issueTracks}
+            </Grid>
         </Container>
     )
 }
@@ -80,17 +82,17 @@ export function IssueTrack(props) {
     );
 
     return (
-        <div>
+        <Grid container gap={1}>
             <Chip variant="outlined"
                   label={props.filter.charAt(0).toUpperCase() + props.filter.slice(1) + ": " + props.filterReference.description}
                   sx={{background: props.filterReference.color}}
             />
-            <Grid container spacing={2} padding={2}
+            <Grid container spacing={2} gap={1}
                   alignItems="stretch"
             >
                 {issueCards}
             </Grid>
-        </div>
+        </Grid>
     )
 }
 
@@ -160,13 +162,14 @@ export function IssueCard(props) {
                         </Grid>
 
                         <Grid item>
-                            <Typography variant={"h6"}  sx={{height: "3em", fontSize: "1em"}} onClick={viewIssue}>
+                            <Typography variant={"h6"} sx={{height: "3em", fontSize: "1em", cursor: "pointer",}}
+                                        onClick={viewIssue}>
                                 {props.issue.title}
                             </Typography>
                         </Grid>
 
-                        <Grid  item>
-                            <Typography variant={"body2"} >
+                        <Grid item>
+                            <Typography variant={"body2"}>
                                 Assignee: {props.issue.assignee.firstName + " " + props.issue.assignee.lastName}
                             </Typography>
                         </Grid>

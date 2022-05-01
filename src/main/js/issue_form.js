@@ -4,7 +4,7 @@ const React = require('react');
 const client = require('./client');
 
 import {useNavigate, useParams} from "react-router-dom";
-import {Stack, TextField} from "@mui/material";
+import {Stack, TextField, Typography} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import MenuItem from "@mui/material/MenuItem";
@@ -88,17 +88,18 @@ export function IssueForm(props) {
         <Container>
             <Stack
                 spacing={1}
-                padding={1}
                 component="form"
                 noValidate
                 autoComplete="off"
                 onSubmit={handleSubmit}
             >
+                <Typography variant={"h4"}>{issueExtant == null ? "New Issue" : "Editing"}</Typography>
                 <TextField
                     required
                     id="title"
                     label="Issue Title"
                     value={title}
+                    inputProps={{ maxLength: 40 }}
                     onChange={(e) => {
                         setTitle(e.target.value)
                     }}
