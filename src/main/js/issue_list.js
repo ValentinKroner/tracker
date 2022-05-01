@@ -12,8 +12,8 @@ const React = require('react');
 const client = require('./client');
 const follow = require('./follow')
 
-import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export function IssueCardView(props) {
 
@@ -26,7 +26,7 @@ export function IssueCardView(props) {
     }
 
     let references = view === "stage" ? props.appData.stages : props.appData.priorities;
-    let issueTracks = references.map(
+    let issueTracks = references.filter(ref => {return ref.hiddenByDefault !== true}).map(
         ref => <IssueTrack
             key={ref.id}
             appData={props.appData}
@@ -134,7 +134,7 @@ export function IssueCard(props) {
 
     return (
         <Grid item>
-            <Card sx={{width: 300}}>
+            <Card sx={{width: 250}}>
                 <CardContent>
 
                     <Grid container rowSpacing={1}>
@@ -142,27 +142,27 @@ export function IssueCard(props) {
                         <Grid item container direction="row">
                             <Grid item>
                                 <Chip size="small" label={props.issue.priority.description}
-                                      sx={{marginRight: 1, width: 90, background: props.issue.priority.color}}
+                                      sx={{marginRight: 1, width: 70, background: props.issue.priority.color}}
                                 />
                             </Grid>
                             <Grid item>
                                 <Chip variant="outlined" size="small" label={props.issue.stage.description}
-                                      sx={{width: 90}}
+                                      sx={{width: 70}}
                                 />
                             </Grid>
-                            <Grid item>
-                                <IconButton onClick={openMenu}><MenuIcon></MenuIcon></IconButton>
+                            <Grid item container justifyContent="flex-end" sx={{width: 70, marginTop: -1}}>
+                                <IconButton onClick={openMenu}><MoreVertIcon></MoreVertIcon></IconButton>
                             </Grid>
                         </Grid>
 
                         <Grid item>
-                            <Typography variant="h6" sx={{height: "4em"}} onClick={viewIssue}>
+                            <Typography variant={"h6"}  sx={{height: "3em", fontSize: "1em"}} onClick={viewIssue}>
                                 {props.issue.title}
                             </Typography>
                         </Grid>
 
-                        <Grid item>
-                            <Typography>
+                        <Grid  item>
+                            <Typography variant={"body2"} >
                                 Assignee: {props.issue.assignee.firstName + " " + props.issue.assignee.lastName}
                             </Typography>
                         </Grid>
