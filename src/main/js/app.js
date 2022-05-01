@@ -16,6 +16,7 @@ import {BrowserRouter, Route, Routes, useNavigate} from "react-router-dom";
 import {IssueForm} from "./issue_form";
 import {IssueCardView} from "./issue_list";
 import {IssueView} from "./issue_view";
+import Grid from "@mui/material/Grid";
 
 function App() {
 
@@ -74,11 +75,13 @@ function App() {
     return (
         appData == null ? <div/> :
             <div>
-                <AppBar position="static">
+                <AppBar position="static" sx={{margin: 0}}>
                     <Toolbar>
                         <Container>
-                            <ButtonHome/>
-                            <ButtonNew/>
+                            <Grid container sx={{columnGap: 1}}>
+                                <ButtonHome/>
+                                <ButtonNew/>
+                            </Grid>
                         </Container>
                     </Toolbar>
                 </AppBar>
@@ -107,7 +110,7 @@ function App() {
 function ButtonHome() {
 
     const nav = useNavigate();
-    return <Button color="inherit" onClick={() => {
+    return <Button variant="outlined" color="inherit" onClick={() => {
         nav("/")
     }}><HomeIcon/></Button>
 }
@@ -116,7 +119,9 @@ function ButtonNew() {
 
     const nav = useNavigate();
     return <Button
-        color="inherit" onClick={() => {nav("/issue/new")}}
+        variant="outlined" color="inherit" onClick={() => {
+        nav("/issue/new")
+    }}
     >
         <AddBoxIcon></AddBoxIcon>
         New
@@ -125,6 +130,7 @@ function ButtonNew() {
 
 
 ReactDOM.render(
-    <BrowserRouter><App/></BrowserRouter>,
+    <BrowserRouter><App/></BrowserRouter>
+    ,
     document.getElementById('react')
 )

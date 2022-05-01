@@ -132,6 +132,10 @@ export function IssueCard(props) {
         nav("/issue/" + props.issue.id + "/view");
     }
 
+    function editIssue(e) {
+        nav("/issue/" + props.issue.id + "/edit");
+    }
+
     return (
         <Grid item>
             <Card sx={{width: 250}}>
@@ -179,6 +183,9 @@ export function IssueCard(props) {
                 >
                     <MenuItem onClick={viewIssue}>
                         View Issue
+                    </MenuItem>
+                    <MenuItem onClick={editIssue}>
+                        Edit Issue
                     </MenuItem>
                     <MenuItem onClick={advanceStage}>
                         Next Stage
