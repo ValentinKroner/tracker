@@ -23,6 +23,7 @@ export function IssueForm(props) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [assignee, setAssignee] = useState("");
+    const [stage, setStage] = useState("");
     const [priority, setPriority] = useState("");
     const [project, setProject] = useState("");
 
@@ -57,6 +58,7 @@ export function IssueForm(props) {
         setAssignee(resolveById(issueExtant.assignee.id, props.appData.users));
         setPriority(resolveById(issueExtant.priority.id, props.appData.priorities));
         setProject(resolveById(issueExtant.project.id, props.appData.projects));
+        setStage(resolveById(issueExtant.stage.id, props.appData.stages));
     }, [issueExtant]);
 
     function handleSubmit(e) {
@@ -70,8 +72,10 @@ export function IssueForm(props) {
             "project": project
         }
 
-        if (props.mode === "edit")
-            issueData.id = issueExtant.id
+        if (props.mode === "edit") {
+            issueData.id = issueExtant.id;
+            issueData.stage = stage;
+        }
 
         client({
             method: props.mode === "new" ? "POST" : "PUT",
@@ -99,7 +103,7 @@ export function IssueForm(props) {
                     id="title"
                     label="Issue Title"
                     value={title}
-                    inputProps={{ maxLength: 40 }}
+                    inputProps={{maxLength: 40}}
                     onChange={(e) => {
                         setTitle(e.target.value)
                     }}
@@ -107,7 +111,7 @@ export function IssueForm(props) {
 
                 <Grid container sx={{gap: 1}}>
 
-                    <FormControl required sx={{flexGrow: 1, minWidth:250}}>
+                    <FormControl required sx={{flexGrow: 1, minWidth: 250}}>
                         <InputLabel>Project</InputLabel>
                         <Select
                             required
@@ -124,7 +128,7 @@ export function IssueForm(props) {
                     </FormControl>
 
 
-                    <FormControl required sx={{flexGrow: 1, minWidth:250}}>
+                    <FormControl required sx={{flexGrow: 1, minWidth: 250}}>
                         <InputLabel>Priority</InputLabel>
                         <Select
                             required
@@ -139,7 +143,27 @@ export function IssueForm(props) {
                                                                                 value={priority}>{priority.description}</MenuItem>)}
                         </Select>
                     </FormControl>
-                    <FormControl required sx={{flexGrow: 1, minWidth:250}}>
+
+                    {props.mode === "edit" ?
+                        <FormControl required
+                                     sx={{flexGrow: 1, minWidth: 250}}>
+                            <InputLabel>Stage</InputLabel>
+                            <Select
+                                required
+                                id="stage"
+                                label="Stage"
+                                value={stage}
+                                onChange={(e) => {
+                                    setStage(e.target.value)
+                                }}
+                            >
+                                {props.appData.stages.map(stage => <MenuItem key={stage.id}
+                                                                             value={stage}>{stage.description}</MenuItem>)}
+                            </Select>
+                        </FormControl> : <div></div>
+                    }
+
+                    <FormControl required sx={{flexGrow: 1, minWidth: 250}}>
                         <InputLabel>Assignee</InputLabel>
                         <Select
                             required
@@ -169,7 +193,7 @@ export function IssueForm(props) {
                     }}
                 />
 
-                <Button variant="contained" sx={{width:100}} onClick={handleSubmit}>
+                <Button variant="contained" sx={{width: 100}} onClick={handleSubmit}>
                     Submit
                 </Button>
             </Stack>

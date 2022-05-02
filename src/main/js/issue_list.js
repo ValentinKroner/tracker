@@ -14,11 +14,12 @@ const follow = require('./follow')
 
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Pagination from "@mui/material/Pagination";
 
 export function IssueCardView(props) {
 
     const [view, setView] = useState("stage")
-    const [ordering, setOrdering] = useState("priority.value")
+    const [ordering, setOrdering] = useState("priority.value,desc")
     const [reload, setReload] = useState(false)
 
     function refreshView() {
@@ -46,7 +47,7 @@ export function IssueCardView(props) {
             <Grid container gap={1} sx={{marginBottom: 2, marginTop: 2}}>
                 <Button variant="outlined" onClick={() => {
                     setView("stage");
-                    setOrdering("priority.value");
+                    setOrdering("priority.value,desc");
                 }}>Sort: Stage</Button>
                 <Button variant="outlined" onClick={() => {
                     setView("priority");
@@ -65,21 +66,34 @@ export function IssueCardView(props) {
 export function IssueTrack(props) {
 
     const [issues, setIssues] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(4);
 
     function reloadIssues() {
-        let path = `/api/issues?assignee=${props.appData.currentUser.id}&${props.filter}=${props.filterReference.id}&sort=${props.ordering}`
-        client({method: 'GET', path: path}).done(response => {
+        let path = `/api/issues?assignee=${props.appData.currentUser.id}&` +
+        `${props.filter}=${props.filterReference.id}&` +
+        `sort=${props.ordering}&page=${currentPage-1}&size=${pageSize}`
+        client({
+            method: 'GET',
+            path: path
+        }).done(response => {
             setIssues(response.entity.content);
+            setTotalPages(response.entity.totalPages);
         });
     }
 
     useEffect(() => {
         reloadIssues();
-    }, [props.filter, props.appData, props.filterReference, props.ordering, props.reload]);
+    }, [props.filter, props.appData, props.filterReference, props.ordering, props.reload, currentPage, pageSize]);
 
     let issueCards = issues.map(issue =>
         <IssueCard key={issue.id} issue={issue} refreshView={props.refreshView}/>
     );
+
+    function handlePagination(event, value) {
+        setCurrentPage(value)
+    }
 
     return (
         <Grid container gap={1}>
@@ -92,6 +106,7 @@ export function IssueTrack(props) {
             >
                 {issueCards}
             </Grid>
+            <Pagination count={totalPages} page={currentPage} siblingCount={3} onChange={handlePagination}/>
         </Grid>
     )
 }
