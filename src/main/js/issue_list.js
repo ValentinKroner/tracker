@@ -56,7 +56,7 @@ export function IssueCardView(props) {
             </Grid>
 
             <Grid container direction={"column"} gap={4}>
-            {issueTracks}
+                {issueTracks}
             </Grid>
         </Container>
     )
@@ -72,8 +72,9 @@ export function IssueTrack(props) {
 
     function reloadIssues() {
         let path = `/api/issues?assignee=${props.appData.currentUser.id}&` +
-        `${props.filter}=${props.filterReference.id}&` +
-        `sort=${props.ordering}&page=${currentPage-1}&size=${pageSize}`
+            `${props.filter}=${props.filterReference.id}&` +
+            `hidden=false&` +
+            `sort=${props.ordering}&page=${currentPage - 1}&size=${pageSize}`
         client({
             method: 'GET',
             path: path

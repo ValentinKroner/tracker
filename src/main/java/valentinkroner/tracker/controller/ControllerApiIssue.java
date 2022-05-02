@@ -1,6 +1,8 @@
 package valentinkroner.tracker.controller;
 
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.NotEqual;
+import net.kaczmarzyk.spring.data.jpa.domain.NotNull;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
@@ -49,6 +51,7 @@ public class ControllerApiIssue {
             @And({
                     @Spec(path = "a.id", params = "assignee", spec = Equal.class),
                     @Spec(path = "s.id", params = "stage", spec = Equal.class),
+                    @Spec(path = "s.hiddenByDefault", params = "hidden", spec = Equal.class),
                     @Spec(path = "p.id", params = "priority", spec = Equal.class)
             })
                     Specification<Issue> issueSpec,
