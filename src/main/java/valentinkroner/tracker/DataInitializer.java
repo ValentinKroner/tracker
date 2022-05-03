@@ -6,38 +6,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import valentinkroner.tracker.repository.*;
+import valentinkroner.tracker.service.ProjectService;
+
+import java.util.List;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
-    private final ProjectRepository projectRepository;
-    private final IssueStageRepository issueStageRepository;
-    private final IssuePriorityRepository issuePriorityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProjectService projectService;
 
     @Autowired
     public DataInitializer(
             UserRepository userRepository,
             IssueRepository issueRepository,
-            ProjectRepository projectRepository,
-            IssueStageRepository issueStageRepository,
-            IssuePriorityRepository issuePriorityRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            ProjectService projectService
     ) {
         this.userRepository = userRepository;
         this.issueRepository = issueRepository;
-        this.projectRepository = projectRepository;
-        this.issueStageRepository = issueStageRepository;
-        this.issuePriorityRepository = issuePriorityRepository;
         this.passwordEncoder = passwordEncoder;
+        this.projectService = projectService;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        //Do not generate dummy data if there is already dummy data
+        //Do not generate initial data if there is already initial data
         Iterable<User> allUsers = this.userRepository.findAll();
         for (User u : allUsers) {
             return;
@@ -57,52 +54,10 @@ public class DataInitializer implements CommandLineRunner {
         userB.setPassword(passwordEncoder.encode("demo"));
         this.userRepository.save(userB);
 
-        //Initial priorities config
-        IssuePriority priorityLow = new IssuePriority();
-        priorityLow.setDescription("low");
-        priorityLow.setValue(0);
-        priorityLow.setColor("#03fc98");
-        this.issuePriorityRepository.save(priorityLow);
-
-        IssuePriority priorityMedium = new IssuePriority();
-        priorityMedium.setDescription("medium");
-        priorityMedium.setValue(1);
-        priorityMedium.setColor("#6ffc03");
-        this.issuePriorityRepository.save(priorityMedium);
-
-        IssuePriority priorityHigh = new IssuePriority();
-        priorityHigh.setDescription("high");
-        priorityHigh.setValue(2);
-        priorityHigh.setColor("#fc4e03");
-        this.issuePriorityRepository.save(priorityHigh);
-
-        //Initial stages config
-        IssueStage stageOpen = new IssueStage();
-        stageOpen.setDescription("open");
-        stageOpen.setOrdinal(0);
-        this.issueStageRepository.save(stageOpen);
-
-        IssueStage stageInProgress = new IssueStage();
-        stageInProgress.setDescription("in progress");
-        stageInProgress.setOrdinal(1);
-        this.issueStageRepository.save(stageInProgress);
-
-        IssueStage stageFinished = new IssueStage();
-        stageFinished.setDescription("finished");
-        stageFinished.setOrdinal(2);
-        this.issueStageRepository.save(stageFinished);
-
-        IssueStage stageClosed = new IssueStage();
-        stageClosed.setDescription("closed");
-        stageClosed.setOrdinal(3);
-        stageClosed.setHiddenByDefault(true);
-        this.issueStageRepository.save(stageClosed);
-
         //Project
-        Project project = new Project();
-        project.setName("Example project");
-        project.setDescription("A sample project, with some sample issues.");
-        this.projectRepository.save(project);
+        Project project = this.projectService.createBlankProject();
+        List<IssuePriority> priorities = project.getPriorities();
+        List<IssueStage> stages = project.getStages();
 
         //Some issues
         Issue issue;
@@ -113,8 +68,8 @@ public class DataInitializer implements CommandLineRunner {
         issue.setAssignee(user);
         issue.setCreator(user);
         issue.setProject(project);
-        issue.setStage(stageOpen);
-        issue.setPriority(priorityMedium);
+        issue.setStage(stages.get(0));
+        issue.setPriority(priorities.get(1));
         this.issueRepository.save(issue);
 
         issue = new Issue();
@@ -123,8 +78,8 @@ public class DataInitializer implements CommandLineRunner {
         issue.setAssignee(user);
         issue.setCreator(user);
         issue.setProject(project);
-        issue.setStage(stageInProgress);
-        issue.setPriority(priorityHigh);
+        issue.setStage(stages.get(1));
+        issue.setPriority(priorities.get(2));
         this.issueRepository.save(issue);
 
         issue = new Issue();
@@ -133,10 +88,9 @@ public class DataInitializer implements CommandLineRunner {
         issue.setAssignee(user);
         issue.setCreator(user);
         issue.setProject(project);
-        issue.setStage(stageFinished);
-        issue.setPriority(priorityMedium);
+        issue.setStage(stages.get(2));
+        issue.setPriority(priorities.get(0));
         this.issueRepository.save(issue);
-
 
         issue = new Issue();
         issue.setTitle("Example issue #4");
@@ -144,8 +98,8 @@ public class DataInitializer implements CommandLineRunner {
         issue.setAssignee(userB);
         issue.setCreator(user);
         issue.setProject(project);
-        issue.setStage(stageOpen);
-        issue.setPriority(priorityMedium);
+        issue.setStage(stages.get(0));
+        issue.setPriority(priorities.get(1));
         this.issueRepository.save(issue);
 
     }

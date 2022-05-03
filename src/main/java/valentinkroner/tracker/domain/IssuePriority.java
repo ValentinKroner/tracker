@@ -2,15 +2,14 @@ package valentinkroner.tracker.domain;
 
 import org.hibernate.boot.model.source.spi.Sortable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class IssuePriority implements Comparable<IssuePriority> {
 
     private Long id;
+
+    private Project project;
 
     private String description;
     private String color;
@@ -24,6 +23,17 @@ public class IssuePriority implements Comparable<IssuePriority> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
+    }
+
+
+    @ManyToOne(targetEntity = Project.class)
+    @JoinColumn(nullable = false)
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public String getDescription() {

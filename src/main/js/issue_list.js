@@ -22,25 +22,53 @@ export function IssueCardView(props) {
     const [ordering, setOrdering] = useState("priority.value,desc")
     const [reload, setReload] = useState(false)
 
+    const [priorities, setPriorities] = useState(null);
+    const [stages, setStages] = useState(null);
+
+    const [tracks, setTracks] = useState(null);
+
+    useEffect(() => {
+        if (props.appData.currentProject == null)
+            return;
+
+        client({
+            method: "GET",
+            path: "/api/issuePriorities?project=" + props.appData.currentProject.id
+        }).done(response => {
+            setPriorities(response.entity.content);
+        });
+
+        client({
+            method: "GET",
+            path: "/api/issueStages?project=" + props.appData.currentProject.id
+        }).done(response => {
+            setStages(response.entity.content);
+        });
+    }, [props.appData.currentProject]);
+
+    useEffect(() => {
+        if(stages == null || priorities == null)
+            return;
+        let references = view === "stage" ? stages : priorities;
+        references = references.filter(ref => {
+            return ref.hiddenByDefault !== true
+        }).map(
+            ref => <IssueTrack
+                key={ref.id}
+                appData={props.appData}
+                filter={view}
+                refreshView={refreshView}
+                reload={reload}
+                filterReference={ref}
+                ordering={ordering}
+            />
+        );
+        setTracks(references);
+    }, [priorities, stages])
+
     function refreshView() {
         setReload(!reload);
     }
-
-    let references = view === "stage" ? props.appData.stages : props.appData.priorities;
-    let issueTracks = references.filter(ref => {
-        return ref.hiddenByDefault !== true
-    }).map(
-        ref => <IssueTrack
-            key={ref.id}
-            appData={props.appData}
-            filter={view}
-            refreshView={refreshView}
-            reload={reload}
-            filterReference={ref}
-            ordering={ordering}
-        />
-    );
-
 
     return (
         <Container>
@@ -56,7 +84,7 @@ export function IssueCardView(props) {
             </Grid>
 
             <Grid container direction={"column"} gap={4}>
-                {issueTracks}
+                {tracks}
             </Grid>
         </Container>
     )

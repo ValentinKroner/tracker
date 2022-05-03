@@ -57,14 +57,16 @@ public class ControllerApiIssue {
 
     @GetMapping(path = "/api/issues")
     public Page<Issue> findIssues(
+            @Join(path = "project", alias = "p")
             @Join(path = "assignee", alias = "a")
             @Join(path = "stage", alias = "s")
-            @Join(path = "priority", alias = "p")
+            @Join(path = "priority", alias = "pr")
             @And({
+                    @Spec(path = "p.id", params = "project", spec = Equal.class),
                     @Spec(path = "a.id", params = "assignee", spec = Equal.class),
                     @Spec(path = "s.id", params = "stage", spec = Equal.class),
                     @Spec(path = "s.hiddenByDefault", params = "hidden", spec = Equal.class),
-                    @Spec(path = "p.id", params = "priority", spec = Equal.class)
+                    @Spec(path = "pr.id", params = "priority", spec = Equal.class)
             })
                     Specification<Issue> issueSpec,
             Pageable pageable) {

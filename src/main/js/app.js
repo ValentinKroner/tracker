@@ -17,61 +17,52 @@ import {IssueForm} from "./issue_form";
 import {IssueCardView} from "./issue_list";
 import {IssueView} from "./issue_view";
 import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
 
 function App() {
 
     const [appData, setAppData] = useState(null);
 
-    const [users, setUsers] = useState(null);
-    const [priorities, setPriorities] = useState(null);
-    const [stages, setStages] = useState(null);
     const [projects, setProjects] = useState(null);
+    const [currentProject, setCurrentProject] = useState(null);
+
+    const [users, setUsers] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    //Initial load calls
+
     useEffect(() => {
+        client({
+            method: "GET",
+            path: "/api/projects"
+        }).done(response => {
+            setProjects(response.entity.content);
+            setCurrentProject(response.entity.content[0]);
+        });
         client({method: 'GET', path: '/api/users'}).done(response => {
             setUsers(response.entity.content);
         });
         client({method: 'GET', path: '/api/users/current'}).done(response => {
             setCurrentUser(response.entity);
         });
-        client({
-            method: "GET",
-            path: "/api/issuePriorities"
-        }).done(response => {
-            setPriorities(response.entity.content);
-        })
-        client({
-            method: "GET",
-            path: "/api/issueStages"
-        }).done(response => {
-            setStages(response.entity.content);
-        })
-        client({
-            method: "GET",
-            path: "/api/projects"
-        }).done(response => {
-            setProjects(response.entity.content);
-        })
     }, []);
 
     //Once loads are complete, set appData as single fixed entity
     useEffect(() => {
 
-        if (users == null || currentUser == null || priorities == null || stages == null || projects == null)
+        if (users == null || currentUser == null || currentProject == null || projects == null)
             return;
 
         setAppData({
             "users": users,
             "currentUser": currentUser,
-            "priorities": priorities,
-            "stages": stages,
+            "currentProject": currentProject,
             "projects": projects,
         })
 
-    }, [users, currentUser, priorities, stages, projects])
-
+    }, [users, currentUser, currentProject, projects])
 
     return (
         appData == null ? <div/> :
@@ -82,6 +73,7 @@ function App() {
                             <Grid container sx={{columnGap: 1}}>
                                 <ButtonHome/>
                                 <ButtonNew/>
+                                <ProjectSelect appData={appData} setCurrentProject={setCurrentProject}/>
                             </Grid>
                         </Container>
                     </Toolbar>
@@ -106,6 +98,25 @@ function App() {
 
             </div>
     )
+}
+
+function ProjectSelect(props) {
+    return <FormControl required
+                        sx={{flexGrow: 1, minWidth: 250}}>
+        <InputLabel>Project</InputLabel>
+        <Select
+            required
+            id="stage"
+            label="Stage"
+            value={props.appData.currentProject}
+            onChange={(e) => {
+                props.setCurrentProject(e.target.value)
+            }}
+        >
+            {props.appData.projects.map(project => <MenuItem size="small" key={project.id}
+                                                     value={project}>{project.name}</MenuItem>)}
+        </Select>
+    </FormControl>
 }
 
 function ButtonHome() {

@@ -1,9 +1,7 @@
 package valentinkroner.tracker.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Project {
@@ -12,6 +10,9 @@ public class Project {
 
     private String name;
     private String description;
+
+    private List<IssuePriority> priorities;
+    private List<IssueStage> stages;
 
     public void setId(Long id) {
         this.id = id;
@@ -37,5 +38,26 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    @OneToMany(targetEntity = IssuePriority.class)
+    @JoinColumn()
+    public List<IssuePriority> getPriorities() {
+        return priorities;
+    }
+
+    public void setPriorities(List<IssuePriority> priorities) {
+        this.priorities = priorities;
+    }
+
+    @OneToMany(targetEntity = IssueStage.class)
+    @JoinColumn()
+    public List<IssueStage> getStages() {
+        return stages;
+    }
+
+    public void setStages(List<IssueStage> stages) {
+        this.stages = stages;
     }
 }

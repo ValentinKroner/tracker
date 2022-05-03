@@ -19,6 +19,9 @@ export function IssueForm(props) {
     const nav = useNavigate();
     const params = useParams();
 
+    const [priorities, setPriorities] = useState(null);
+    const [stages, setStages] = useState(null);
+
     //Form state
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -40,12 +43,30 @@ export function IssueForm(props) {
 
     }, [])
 
+
+    useEffect(() => {
+        if (project == null)
+            return;
+
+        client({
+            method: "GET",
+            path: "/api/issuePriorities?project=" + project.id
+        }).done(response => {
+            setPriorities(response.entity.content);
+        });
+
+        client({
+            method: "GET",
+            path: "/api/issueStages?project=" + project.id
+        }).done(response => {
+            setStages(response.entity.content);
+        });
+    }, [project]);
+
     function resolveById(id, collection) {
         let filtered = collection.filter((a) => {
             return a.id === id
         });
-
-        console.log(filtered);
         return filtered.length > 0 ? filtered[0] : null;
     }
 
@@ -56,10 +77,10 @@ export function IssueForm(props) {
         setDescription(issueExtant.description);
 
         setAssignee(resolveById(issueExtant.assignee.id, props.appData.users));
-        setPriority(resolveById(issueExtant.priority.id, props.appData.priorities));
         setProject(resolveById(issueExtant.project.id, props.appData.projects));
-        setStage(resolveById(issueExtant.stage.id, props.appData.stages));
-    }, [issueExtant]);
+        setPriority(resolveById(issueExtant.priority.id, priorities));
+        setStage(resolveById(issueExtant.stage.id, stages));
+    }, [issueExtant, stages, priorities]);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -88,7 +109,7 @@ export function IssueForm(props) {
     }
 
     return (
-
+        (priorities == null || stages == null) ? <div></div> :
         <Container>
             <Stack
                 spacing={1}
@@ -139,7 +160,7 @@ export function IssueForm(props) {
                                 setPriority(e.target.value)
                             }}
                         >
-                            {props.appData.priorities.map(priority => <MenuItem key={priority.id}
+                            {priorities.map(priority => <MenuItem key={priority.id}
                                                                                 value={priority}>{priority.description}</MenuItem>)}
                         </Select>
                     </FormControl>
@@ -157,7 +178,7 @@ export function IssueForm(props) {
                                     setStage(e.target.value)
                                 }}
                             >
-                                {props.appData.stages.map(stage => <MenuItem key={stage.id}
+                                {stages.map(stage => <MenuItem key={stage.id}
                                                                              value={stage}>{stage.description}</MenuItem>)}
                             </Select>
                         </FormControl> : <div></div>

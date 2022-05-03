@@ -1,14 +1,13 @@
 package valentinkroner.tracker.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class IssueStage {
 
     private Long id;
+
+    private Project project;
 
     private String description;
     private int ordinal;
@@ -25,6 +24,17 @@ public class IssueStage {
         return id;
     }
 
+    @ManyToOne(targetEntity = Project.class)
+    @JoinColumn(nullable = false)
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    @Column(length = 4095)
     public String getDescription() {
         return description;
     }
