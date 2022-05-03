@@ -1,5 +1,6 @@
 package valentinkroner.tracker;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import valentinkroner.tracker.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +15,7 @@ public class DataInitializer implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final IssueStageRepository issueStageRepository;
     private final IssuePriorityRepository issuePriorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public DataInitializer(
@@ -21,12 +23,15 @@ public class DataInitializer implements CommandLineRunner {
             IssueRepository issueRepository,
             ProjectRepository projectRepository,
             IssueStageRepository issueStageRepository,
-            IssuePriorityRepository issuePriorityRepository) {
+            IssuePriorityRepository issuePriorityRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
         this.issueStageRepository = issueStageRepository;
         this.issuePriorityRepository = issuePriorityRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -41,11 +46,15 @@ public class DataInitializer implements CommandLineRunner {
         User user = new User();
         user.setFirstName("This");
         user.setLastName("Person");
+        user.setLogin("user");
+        user.setPassword(passwordEncoder.encode("demo"));
         this.userRepository.save(user);
 
         User userB = new User();
         userB.setFirstName("Other");
         userB.setLastName("Person");
+        userB.setLogin("user_2");
+        userB.setPassword(passwordEncoder.encode("demo"));
         this.userRepository.save(userB);
 
         //Initial priorities config

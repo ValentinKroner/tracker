@@ -13,9 +13,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import valentinkroner.tracker.auth.TrackerUserPrincipal;
 import valentinkroner.tracker.domain.Issue;
 import valentinkroner.tracker.domain.IssueStage;
+import valentinkroner.tracker.domain.User;
 import valentinkroner.tracker.repository.IssueRepository;
 import valentinkroner.tracker.repository.IssueStageRepository;
 import valentinkroner.tracker.repository.UserRepository;
@@ -36,6 +39,15 @@ public class ControllerApiIssue {
 
     @Autowired
     private UserRepository userRepository;
+
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof TrackerUserPrincipal) {
+            TrackerUserPrincipal p = (TrackerUserPrincipal) principal;
+            return p.getUser();
+        }
+        return null;
+    }
 
     @GetMapping("/api/issues/{id}")
     public Issue getOne(@PathVariable Long id) {
@@ -68,8 +80,7 @@ public class ControllerApiIssue {
 
         //TODO use sort order when implemented
         newIssue.setStage(issueStageRepository.findById(1L).orElseThrow());
-        //TODO use system user when implemented
-        newIssue.setCreator(userRepository.findById(1L).orElseThrow());
+        newIssue.setCreator(this.getCurrentUser());
         return issueRepository.save(newIssue);
     }
 

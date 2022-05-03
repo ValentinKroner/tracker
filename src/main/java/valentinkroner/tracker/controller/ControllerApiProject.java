@@ -16,7 +16,7 @@ import valentinkroner.tracker.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/projects")
-public class ControllerProject {
+public class ControllerApiProject {
 
     @Autowired
     private ProjectRepository projectRepository;

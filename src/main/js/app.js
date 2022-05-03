@@ -31,9 +31,10 @@ function App() {
     //Initial load calls
     useEffect(() => {
         client({method: 'GET', path: '/api/users'}).done(response => {
-            //TODO use auth system when available
-            setCurrentUser(response.entity.content[0]);
             setUsers(response.entity.content);
+        });
+        client({method: 'GET', path: '/api/users/current'}).done(response => {
+            setCurrentUser(response.entity);
         });
         client({
             method: "GET",
@@ -58,7 +59,7 @@ function App() {
     //Once loads are complete, set appData as single fixed entity
     useEffect(() => {
 
-        if (users == null || priorities == null || stages == null || projects == null)
+        if (users == null || currentUser == null || priorities == null || stages == null || projects == null)
             return;
 
         setAppData({
@@ -69,7 +70,7 @@ function App() {
             "projects": projects,
         })
 
-    }, [users, priorities, stages, projects])
+    }, [users, currentUser, priorities, stages, projects])
 
 
     return (
