@@ -64,9 +64,11 @@ export function IssueCardView(props) {
             />
         );
         setTracks(references);
-    }, [priorities, stages])
+    }, [priorities, stages, reload])
 
     function refreshView() {
+
+        console.log("yep");
         setReload(!reload);
     }
 
@@ -166,6 +168,26 @@ export function IssueCard(props) {
         setMenuAnchor(null);
     }
 
+    function increasePriority(e) {
+        client({
+            path: "/api/issues/increase/" + props.issue.id,
+            method: "GET"
+        }).then((response) => {
+            props.refreshView();
+        });
+        setMenuAnchor(null);
+    }
+
+    function decreasePriority(e) {
+        client({
+            path: "/api/issues/decrease/" + props.issue.id,
+            method: "GET"
+        }).then((response) => {
+            props.refreshView();
+        });
+        setMenuAnchor(null);
+    }
+
     function openMenu(e) {
         setMenuAnchor(e.target);
     }
@@ -239,6 +261,12 @@ export function IssueCard(props) {
                     </MenuItem>
                     <MenuItem onClick={revertStage}>
                         Previous Stage
+                    </MenuItem>
+                    <MenuItem onClick={increasePriority}>
+                        Increase Priority
+                    </MenuItem>
+                    <MenuItem onClick={decreasePriority}>
+                        Decrease Priority
                     </MenuItem>
                 </Menu>
 

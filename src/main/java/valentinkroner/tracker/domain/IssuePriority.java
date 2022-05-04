@@ -1,5 +1,6 @@
 package valentinkroner.tracker.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.boot.model.source.spi.Sortable;
 
 import javax.persistence.*;
@@ -27,7 +28,7 @@ public class IssuePriority implements Comparable<IssuePriority> {
 
 
     @ManyToOne(targetEntity = Project.class)
-    @JoinColumn(nullable = false)
+    @JsonBackReference
     public Project getProject() {
         return project;
     }

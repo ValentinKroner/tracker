@@ -1,5 +1,7 @@
 package valentinkroner.tracker.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -25,7 +27,7 @@ public class IssueStage {
     }
 
     @ManyToOne(targetEntity = Project.class)
-    @JoinColumn(nullable = false)
+    @JsonBackReference
     public Project getProject() {
         return project;
     }

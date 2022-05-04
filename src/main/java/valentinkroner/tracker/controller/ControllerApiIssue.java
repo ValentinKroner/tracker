@@ -16,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import valentinkroner.tracker.auth.TrackerUserPrincipal;
-import valentinkroner.tracker.domain.Issue;
-import valentinkroner.tracker.domain.IssueStage;
-import valentinkroner.tracker.domain.User;
+import valentinkroner.tracker.domain.*;
 import valentinkroner.tracker.repository.IssueRepository;
 import valentinkroner.tracker.repository.IssueStageRepository;
 import valentinkroner.tracker.repository.UserRepository;
@@ -80,9 +78,14 @@ public class ControllerApiIssue {
             @RequestBody Issue newIssue
     ) throws ServerException {
 
-        //TODO use sort order when implemented
-        newIssue.setStage(issueStageRepository.findById(1L).orElseThrow());
+        Project project = newIssue.getProject();
+        if(project == null)
+            throw new ServerException("Project is required.");
+
+        if(newIssue.getStage() == null)
+            newIssue.setStage(project.getStages().get(0)); //TODO use lowest instead
         newIssue.setCreator(this.getCurrentUser());
+
         return issueRepository.save(newIssue);
     }
 
@@ -126,7 +129,7 @@ public class ControllerApiIssue {
 
         int ordinal = issue.getStage().getOrdinal();
         IssueStage stageNew = null;
-        for(IssueStage stage : issueStageRepository.findAll()) {
+        for(IssueStage stage : issue.getProject().getStages()) {
             if(stage.getOrdinal() <= ordinal)
                 continue;
             if(stageNew == null || stageNew.getOrdinal() > stage.getOrdinal())
@@ -146,7 +149,7 @@ public class ControllerApiIssue {
 
         int ordinal = issue.getStage().getOrdinal();
         IssueStage stageNew = null;
-        for(IssueStage stage : issueStageRepository.findAll()) {
+        for(IssueStage stage : issue.getProject().getStages()) {
             if(stage.getOrdinal() >= ordinal)
                 continue;
             if(stageNew == null || stageNew.getOrdinal() < stage.getOrdinal())
@@ -159,5 +162,45 @@ public class ControllerApiIssue {
         }
     }
 
+
+    @GetMapping("/api/issues/increase/{id}")
+    public void increasePriority(@PathVariable Long id) {
+
+        Issue issue = issueRepository.findById(id).orElseThrow();
+
+        int value = issue.getPriority().getValue();
+        IssuePriority priorityNew = null;
+        for(IssuePriority priority : issue.getProject().getPriorities()) {
+            if(priority.getValue() <= value)
+                continue;
+            if(priorityNew == null || priorityNew.getValue() > priority.getValue())
+                priorityNew = priority;
+        }
+
+        if(priorityNew != null) {
+            issue.setPriority(priorityNew);
+            issueRepository.save(issue);
+        }
+    }
+
+    @GetMapping("/api/issues/decrease/{id}")
+    public void decreaseIssue(@PathVariable Long id) {
+
+        Issue issue = issueRepository.findById(id).orElseThrow();
+
+        int value = issue.getPriority().getValue();
+        IssuePriority priorityNew = null;
+        for(IssuePriority priority : issue.getProject().getPriorities()) {
+            if(priority.getValue() >= value)
+                continue;
+            if(priorityNew == null || priorityNew.getValue() < priority.getValue())
+                priorityNew = priority;
+        }
+
+        if(priorityNew != null) {
+            issue.setPriority(priorityNew);
+            issueRepository.save(issue);
+        }
+    }
 
 }

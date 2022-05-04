@@ -1,5 +1,9 @@
 package valentinkroner.tracker.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -41,8 +45,8 @@ public class Project {
     }
 
 
-    @OneToMany(targetEntity = IssuePriority.class)
-    @JoinColumn()
+    @OneToMany(targetEntity = IssuePriority.class, mappedBy="project")
+    @JsonManagedReference
     public List<IssuePriority> getPriorities() {
         return priorities;
     }
@@ -51,8 +55,8 @@ public class Project {
         this.priorities = priorities;
     }
 
-    @OneToMany(targetEntity = IssueStage.class)
-    @JoinColumn()
+    @OneToMany(targetEntity = IssueStage.class, mappedBy="project")
+    @JsonManagedReference
     public List<IssueStage> getStages() {
         return stages;
     }
