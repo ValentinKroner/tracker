@@ -73,6 +73,7 @@ function App() {
                             <Grid container sx={{columnGap: 1}}>
                                 <ButtonHome/>
                                 <ButtonNew/>
+                                <Grid item sx={{flexGrow: 1}}></Grid>
                                 <ProjectSelect appData={appData} setCurrentProject={setCurrentProject}/>
                             </Grid>
                         </Container>
@@ -101,10 +102,10 @@ function App() {
 }
 
 function ProjectSelect(props) {
-    return <FormControl required
-                        sx={{flexGrow: 1, minWidth: 250}}>
-        <InputLabel>Project</InputLabel>
+    return <FormControl required>
+        <InputLabel sx={{color: "inherit"}}>Project</InputLabel>
         <Select
+            sx={{minWidth: 150, height: "2.5em", color: "inherit", borderColor: 'inherit'}}
             required
             id="stage"
             label="Stage"
@@ -114,7 +115,7 @@ function ProjectSelect(props) {
             }}
         >
             {props.appData.projects.map(project => <MenuItem size="small" key={project.id}
-                                                     value={project}>{project.name}</MenuItem>)}
+                                                             value={project}>{project.name}</MenuItem>)}
         </Select>
     </FormControl>
 }
