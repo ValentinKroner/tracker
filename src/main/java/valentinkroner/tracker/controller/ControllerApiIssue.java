@@ -8,7 +8,9 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,6 +70,12 @@ public class ControllerApiIssue {
             })
                     Specification<Issue> issueSpec,
             Pageable pageable) {
+
+        //Add in a sort by id to stabilize issue order
+        Sort byId = Sort.by("id").descending();
+        Sort userSort = pageable.getSort();
+        Sort fullSort = userSort.and(byId);
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), fullSort);
 
         return issueRepository.findAll(issueSpec, pageable);
     }

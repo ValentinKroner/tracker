@@ -66,7 +66,7 @@ function App() {
 
     return (
         appData == null ? <div/> :
-            <div>
+            <div style={{marginBottom:100}}>
                 <AppBar position="static" sx={{marginBottom: 4}}>
                     <Toolbar>
                         <Container>
